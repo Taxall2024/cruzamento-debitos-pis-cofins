@@ -2,3 +2,4 @@ modulos==0.2.0
 pandas==2.2.3
 pdfplumber==0.11.5
 streamlit==1.41.1
+openpyxl==3.1.5
