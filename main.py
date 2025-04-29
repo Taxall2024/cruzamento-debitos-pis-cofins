@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import re
 from inputs.efd_loader import carregar_e_processar_arquivos
 from inputs.dctf_loader import carregar_arquivos as carregar_dctf
 from inputs.darf_loader import carregar_darfs
@@ -51,6 +52,19 @@ if df_perdcomp is not None:
     st.subheader("Dados PER/DCOMP")
     st.dataframe(df_perdcomp)
 
+def remove_illegal_chars(val):
+    """
+    Remove caracteres de controle com código Unicode < 0x20, 
+    exceto tab (\t), newline (\n) e carriage return (\r).
+    """
+    if isinstance(val, str):
+        # regex: tudo de \x00 a \x1f, exceto \t (\x09), \n (\x0a), \r (\x0d)
+        return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', val)
+    return val
+
+# ... depois de carregar ou criar df_efd:
+df_efd = df_efd.applymap(remove_illegal_chars)
+
 # 5) Gerar e exibir resumo consolidado
 df_resumo = gerar_df_resumo(df_efd, df_dctf, df_darf, df_perdcomp)
 if df_resumo is not None and not df_resumo.empty:
@@ -61,12 +75,16 @@ if df_resumo is not None and not df_resumo.empty:
     excel_filename = "resumo_cruzamento.xlsx"
     with pd.ExcelWriter(excel_filename) as writer:
         if df_efd is not None:
+            df_efd = df_efd.applymap(remove_illegal_chars)
             df_efd.to_excel(writer, sheet_name='Dados EFD', index=False)
         if not df_dctf.empty:
+            df_dctf = df_dctf.applymap(remove_illegal_chars)
             df_dctf.to_excel(writer, sheet_name='Dados DCTF', index=False)
         if df_darf is not None:
+            df_darf = df_darf.applymap(remove_illegal_chars)
             df_darf.to_excel(writer, sheet_name='Dados DARF', index=False)
         if df_perdcomp is not None:
+            df_perdcomp = df_perdcomp.applymap(remove_illegal_chars)
             df_perdcomp.to_excel(writer, sheet_name='Planilha Importada', index=False)
         df_resumo.to_excel(writer, sheet_name='Resumo', index=False)
 
