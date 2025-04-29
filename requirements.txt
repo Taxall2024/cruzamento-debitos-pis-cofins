@@ -1,2 +1,4 @@
-pandas>=1.3.0
-python-dateutil>=2.8.1
+modulos==0.2.0
+pandas==2.2.3
+pdfplumber==0.11.5
+streamlit==1.41.1
