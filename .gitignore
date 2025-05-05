@@ -1,0 +1,5 @@
+# Ignorar bytecode e cache Python
+__pycache__/
+*.pyc
+# Outras pastas ou arquivos que você não queira subir
+.DS_Store
